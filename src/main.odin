@@ -57,7 +57,10 @@ main :: proc() {
 	init_sdl()
 	defer free_sdl()
 
-	game.pointer = Pointer{Pos{300, 200}, 0.0}
+	game.pointer = Pointer {
+		Pos{300, 200},
+		direction = 0.0,
+	}
 	append(&game.walls, Wall{Pos{100, 50}, Pos{300, 50}})
 
 	event: SDL.Event
@@ -67,10 +70,12 @@ main :: proc() {
 
 			// Inputs go here
 			if event.type == SDL.EventType.MOUSEMOTION {
-				game.pointer.direction = -SDL.atan2f(
-					cast(f32)(game.pointer.pos.x - event.button.x),
-					cast(f32)(game.pointer.pos.y - event.button.y),
-				) - SDL.M_PI/2
+				game.pointer.direction =
+					-SDL.atan2f(
+						cast(f32)(game.pointer.pos.x - event.button.x),
+						cast(f32)(game.pointer.pos.y - event.button.y),
+					) -
+					SDL.M_PI / 2
 			}
 		}
 
