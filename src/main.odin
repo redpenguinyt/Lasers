@@ -8,6 +8,8 @@ WINDOW_FLAGS :: SDL.WINDOW_SHOWN
 WINDOW_WIDTH :: 400
 WINDOW_HEIGHT :: 240
 
+MAX_REFLECTIONS :: 10
+
 Pos :: [2]i32
 
 Wall :: struct {
@@ -126,5 +128,5 @@ start_drawing_laser :: proc() {
 	}
 
 	SDL.SetRenderDrawColor(game.renderer, 255, 0, 0, 100)
-	draw_laser(laser_pos, laser_vel, 10)
+	draw_laser(laser_pos, laser_vel, MAX_REFLECTIONS)
 }
