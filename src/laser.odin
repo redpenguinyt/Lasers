@@ -20,29 +20,17 @@ is_pos_on_screen :: proc(pos: Pos) -> bool {
 	)
 }
 
-draw_laser :: proc() {
-	SDL.SetRenderDrawColor(game.renderer, 255, 0, 0, 100)
-
-	laser_pos: [2]f32 = {
-		cast(f32)game.pointer.x,
-		cast(f32)game.pointer.y,
+draw_laser :: proc(starting_pos, velocity: [2]f32, reflection_limit: int) {
+	if reflection_limit < 1 {
+		return
 	}
-
-	// laser_pos := cast([2]f32)game.pointer.pos // TODO: ask about being able to do this
-
-	laser_vel: [2]f32 = {
-		(3 * SDL.cosf(game.pointer.direction)),
-		(3 * SDL.sinf(game.pointer.direction)),
-	}
+	laser_pos := starting_pos
 
 	drawing_laser: for {
-		i_laser_pos := Pos {
-			cast(i32)laser_pos.x,
-			cast(i32)laser_pos.y,
-		}
+		i_laser_pos := Pos{cast(i32)laser_pos.x, cast(i32)laser_pos.y}
 		i_future_pos := Pos {
-			cast(i32)(laser_pos.x + laser_vel.x),
-			cast(i32)(laser_pos.y + laser_vel.y),
+			cast(i32)(laser_pos.x + velocity.x),
+			cast(i32)(laser_pos.y + velocity.y),
 		}
 
 		for wall in game.walls {
@@ -52,6 +40,11 @@ draw_laser :: proc() {
 				wall.pos1,
 				wall.pos2,
 			) {
+				draw_laser(
+					laser_pos,
+					{velocity.x, -velocity.y}, // TODO calculate where the ray should be facing
+					reflection_limit - 1,
+				)
 				break drawing_laser
 			}
 
@@ -60,14 +53,14 @@ draw_laser :: proc() {
 			}
 		}
 
-		SDL.RenderDrawLine(
-			game.renderer,
-			i_laser_pos.x,
-			i_laser_pos.y,
-			i_future_pos.x,
-			i_future_pos.y,
-		)
-
-		laser_pos += laser_vel
+		laser_pos += velocity
 	}
+
+	SDL.RenderDrawLine(
+		game.renderer,
+		cast(i32)starting_pos.x,
+		cast(i32)starting_pos.y,
+		cast(i32)laser_pos.x,
+		cast(i32)laser_pos.y,
+	)
 }

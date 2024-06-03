@@ -58,10 +58,11 @@ main :: proc() {
 	defer free_sdl()
 
 	game.pointer = Pointer {
-		pos = Pos{300, 200},
+		pos       = Pos{300, 200},
 		direction = 0.0,
 	}
-	append(&game.walls, Wall{Pos{100, 50}, Pos{300, 50}})
+	append(&game.walls, Wall{Pos{100, 60}, Pos{300, 50}})
+	append(&game.walls, Wall{Pos{80, 30}, Pos{60, 200}})
 
 	event: SDL.Event
 	game_loop: for {
@@ -85,7 +86,15 @@ main :: proc() {
 		// Draw code
 		draw_walls()
 
-		draw_laser()
+		laser_pos: [2]f32 = {cast(f32)game.pointer.x, cast(f32)game.pointer.y}
+		// laser_pos := cast([2]f32)game.pointer.pos // TODO: ask about being able to do this
+		laser_vel: [2]f32 = {
+			SDL.cosf(game.pointer.direction),
+			SDL.sinf(game.pointer.direction),
+		}
+
+		SDL.SetRenderDrawColor(game.renderer, 255, 0, 0, 100)
+		draw_laser(laser_pos, laser_vel, 10)
 
 		draw_pointer()
 
