@@ -85,17 +85,7 @@ main :: proc() {
 
 		// Draw code
 		draw_walls()
-
-		laser_pos: [2]f32 = {cast(f32)game.pointer.x, cast(f32)game.pointer.y}
-		// laser_pos := cast([2]f32)game.pointer.pos // TODO: ask about being able to do this
-		laser_vel: [2]f32 = {
-			SDL.cosf(game.pointer.direction),
-			SDL.sinf(game.pointer.direction),
-		}
-
-		SDL.SetRenderDrawColor(game.renderer, 255, 0, 0, 100)
-		draw_laser(laser_pos, laser_vel, 10)
-
+		start_drawing_laser()
 		draw_pointer()
 
 		SDL.RenderPresent(game.renderer)
@@ -125,4 +115,16 @@ draw_pointer :: proc() {
 	lineEndY := pos.y + cast(i32)SDL.roundf(7 * SDL.sinf(direction))
 
 	SDL.RenderDrawLine(game.renderer, pos.x, pos.y, lineEndX, lineEndY)
+}
+
+start_drawing_laser :: proc() {
+	laser_pos: [2]f32 = {cast(f32)game.pointer.x, cast(f32)game.pointer.y}
+	// laser_pos := cast([2]f32)game.pointer.pos // TODO: ask about being able to do this
+	laser_vel: [2]f32 = {
+		SDL.cosf(game.pointer.direction),
+		SDL.sinf(game.pointer.direction),
+	}
+
+	SDL.SetRenderDrawColor(game.renderer, 255, 0, 0, 100)
+	draw_laser(laser_pos, laser_vel, 10)
 }
