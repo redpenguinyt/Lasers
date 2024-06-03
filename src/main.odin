@@ -1,8 +1,6 @@
 package main
 
 import "core:fmt"
-
-import "core:fmt"
 import SDL "vendor:sdl2"
 
 RENDER_FLAGS :: SDL.RENDERER_ACCELERATED
@@ -10,9 +8,22 @@ WINDOW_FLAGS :: SDL.WINDOW_SHOWN
 WINDOW_WIDTH :: 400
 WINDOW_HEIGHT :: 240
 
+Pos :: [2]i32
+
+Wall :: struct {
+	pos1, pos2: Pos,
+}
+
+Pointer :: struct {
+	using pos: Pos,
+	direction: f32,
+}
+
 Game :: struct {
 	window:   ^SDL.Window,
 	renderer: ^SDL.Renderer,
+	walls:    [dynamic]Wall,
+	pointer:  Pointer,
 }
 
 game := Game{}
@@ -40,12 +51,14 @@ free_sdl :: proc() {
 	defer SDL.Quit()
 	defer SDL.DestroyWindow(game.window)
 	defer SDL.DestroyRenderer(game.renderer)
-	defer SDL_TTF.Quit()
 }
 
 main :: proc() {
 	init_sdl()
 	defer free_sdl()
+
+	game.pointer = Pointer{Pos{300, 200}, 0.0}
+	append(&game.walls, Wall{Pos{100, 50}, Pos{300, 50}})
 
 	event: SDL.Event
 	game_loop: for {
@@ -53,13 +66,46 @@ main :: proc() {
 			if event.type == SDL.EventType.QUIT || event.key.keysym.scancode == .ESCAPE do break game_loop
 
 			// Inputs go here
+			if event.type == SDL.EventType.MOUSEMOTION {
+				game.pointer.direction = -SDL.atan2f(
+					cast(f32)(game.pointer.pos.x - event.button.x),
+					cast(f32)(game.pointer.pos.y - event.button.y),
+				) - SDL.M_PI/2
+			}
 		}
 
 		SDL.SetRenderDrawColor(game.renderer, 0, 0, 0, 100)
 		SDL.RenderClear(game.renderer)
 
 		// Draw code
+		draw_walls()
+		draw_pointer()
 
 		SDL.RenderPresent(game.renderer)
 	}
+}
+
+draw_walls :: proc() {
+	SDL.SetRenderDrawColor(game.renderer, 255, 255, 255, 100)
+	for wall in game.walls {
+		SDL.RenderDrawLine(
+			game.renderer,
+			wall.pos1.x,
+			wall.pos1.y,
+			wall.pos2.x,
+			wall.pos2.y,
+		)
+	}
+}
+
+draw_pointer :: proc() {
+	using game.pointer
+
+	SDL.SetRenderDrawColor(game.renderer, 255, 255, 255, 100)
+	SDL.RenderDrawRect(game.renderer, &SDL.Rect{pos.x - 4, pos.y - 4, 8, 8})
+
+	lineEndX := pos.x + cast(i32)SDL.roundf(7 * SDL.cosf(direction))
+	lineEndY := pos.y + cast(i32)SDL.roundf(7 * SDL.sinf(direction))
+
+	SDL.RenderDrawLine(game.renderer, pos.x, pos.y, lineEndX, lineEndY)
 }
