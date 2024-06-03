@@ -58,7 +58,7 @@ main :: proc() {
 	defer free_sdl()
 
 	game.pointer = Pointer {
-		Pos{300, 200},
+		pos = Pos{300, 200},
 		direction = 0.0,
 	}
 	append(&game.walls, Wall{Pos{100, 50}, Pos{300, 50}})
@@ -84,6 +84,9 @@ main :: proc() {
 
 		// Draw code
 		draw_walls()
+
+		draw_laser()
+
 		draw_pointer()
 
 		SDL.RenderPresent(game.renderer)
