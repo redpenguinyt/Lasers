@@ -66,7 +66,8 @@ main :: proc() {
 	append(&game.walls, Wall{Pos{100, 60}, Pos{300, 50}})
 	append(&game.walls, Wall{Pos{80, 30}, Pos{80, 200}})
 	append(&game.walls, Wall{Pos{80, 200}, Pos{100, 220}})
-	append(&game.walls, Wall{Pos{330, 190}, Pos{340, 20}})
+	append(&game.walls, Wall{Pos{340, 20}, Pos{330, 190}})
+	append(&game.walls, Wall{Pos{100, 230}, Pos{300, 225}})
 
 	event: SDL.Event
 	game_loop: for {
@@ -115,8 +116,8 @@ draw_pointer :: proc() {
 	SDL.SetRenderDrawColor(game.renderer, 255, 255, 255, 100)
 	SDL.RenderDrawRect(game.renderer, &SDL.Rect{pos.x - 4, pos.y - 4, 8, 8})
 
-	lineEndX := pos.x + cast(i32)SDL.roundf(7 * SDL.cosf(direction))
-	lineEndY := pos.y + cast(i32)SDL.roundf(7 * SDL.sinf(direction))
+	lineEndX := pos.x + i32(7 * SDL.cosf(direction))
+	lineEndY := pos.y + i32(7 * SDL.sinf(direction))
 
 	SDL.RenderDrawLine(game.renderer, pos.x, pos.y, lineEndX, lineEndY)
 }

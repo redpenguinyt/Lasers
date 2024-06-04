@@ -20,12 +20,17 @@ is_pos_on_screen :: proc(pos: Pos) -> bool {
 	)
 }
 
+angle_between :: proc(angle1, angle2: f32) -> f32 {
+	a := SDL.atan2f(SDL.sinf(angle2 - angle1), SDL.cosf(angle2 - angle1))
+	return a
+}
+
 draw_laser :: proc(starting_pos: [2]f32, angle: f32, reflection_limit: int) {
 	if reflection_limit < 1 {
 		return
 	}
 	laser_pos := starting_pos
-	velocity := [2]f32{2 * SDL.cosf(angle), 2 * SDL.sinf(angle)}
+	velocity := [2]f32{4 * SDL.cosf(angle), 4 * SDL.sinf(angle)}
 
 	drawing_laser: for {
 		i_laser_pos := Pos{cast(i32)laser_pos.x, cast(i32)laser_pos.y}
@@ -42,19 +47,32 @@ draw_laser :: proc(starting_pos: [2]f32, angle: f32, reflection_limit: int) {
 				wall.pos2,
 			) {
 				wall_normal :=
+					SDL.M_PI -
 					SDL.atan2f(
 						f32(wall.pos2.x - wall.pos1.x),
 						f32(wall.pos2.y - wall.pos1.y),
-					) -
-					SDL.M_PI / 2
+					)
 
-				reflection_distance := (angle - wall_normal) * 2
+				if abs(angle_between(angle, wall_normal)) < SDL.M_PI / 2 {
+					wall_normal += SDL.M_PI
+				}
+
+				SDL.RenderDrawLine(
+					game.renderer,
+					wall.pos1.x,
+					wall.pos1.y,
+					wall.pos1.x + i32(30 * SDL.cosf(wall_normal)),
+					wall.pos1.y + i32(30 * SDL.sinf(wall_normal)),
+				)
+
+				reflection_distance := angle_between(angle, wall_normal)
 
 				draw_laser(
 					laser_pos,
-					angle - reflection_distance,
+					angle + reflection_distance * 2,
 					reflection_limit - 1,
 				)
+
 				break drawing_laser
 			}
 
