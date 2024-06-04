@@ -20,11 +20,12 @@ is_pos_on_screen :: proc(pos: Pos) -> bool {
 	)
 }
 
-draw_laser :: proc(starting_pos, velocity: [2]f32, reflection_limit: int) {
+draw_laser :: proc(starting_pos: [2]f32, angle: f32, reflection_limit: int) {
 	if reflection_limit < 1 {
 		return
 	}
 	laser_pos := starting_pos
+	velocity := [2]f32{SDL.cosf(angle), SDL.sinf(angle)}
 
 	drawing_laser: for {
 		i_laser_pos := Pos{cast(i32)laser_pos.x, cast(i32)laser_pos.y}
@@ -40,9 +41,18 @@ draw_laser :: proc(starting_pos, velocity: [2]f32, reflection_limit: int) {
 				wall.pos1,
 				wall.pos2,
 			) {
+				wall_normal :=
+					SDL.atan2f(
+						f32(wall.pos2.x - wall.pos1.x),
+						f32(wall.pos2.y - wall.pos1.y),
+					) -
+					SDL.M_PI / 2
+
+				reflection_distance := (angle - wall_normal) * 2
+
 				draw_laser(
 					laser_pos,
-					{velocity.x, -velocity.y}, // TODO calculate where the ray should be facing
+					angle - reflection_distance,
 					reflection_limit - 1,
 				)
 				break drawing_laser
