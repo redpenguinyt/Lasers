@@ -8,7 +8,7 @@ WINDOW_FLAGS :: SDL.WINDOW_SHOWN
 WINDOW_WIDTH :: 400
 WINDOW_HEIGHT :: 240
 
-MAX_REFLECTIONS :: 10
+MAX_REFLECTIONS :: 30
 
 Pos :: [2]i32
 
@@ -35,7 +35,7 @@ init_sdl :: proc() {
 	assert(sdl_init_error == 0, SDL.GetErrorString())
 
 	game.window = SDL.CreateWindow(
-		"SDL2 Example",
+		"Lasers",
 		SDL.WINDOWPOS_CENTERED,
 		SDL.WINDOWPOS_CENTERED,
 		WINDOW_WIDTH * 3,
@@ -60,11 +60,13 @@ main :: proc() {
 	defer free_sdl()
 
 	game.pointer = Pointer {
-		pos       = Pos{300, 200},
+		pos       = Pos{200, 150},
 		direction = 0.0,
 	}
 	append(&game.walls, Wall{Pos{100, 60}, Pos{300, 50}})
 	append(&game.walls, Wall{Pos{80, 30}, Pos{80, 200}})
+	append(&game.walls, Wall{Pos{80, 200}, Pos{100, 220}})
+	append(&game.walls, Wall{Pos{330, 190}, Pos{340, 20}})
 
 	event: SDL.Event
 	game_loop: for {
