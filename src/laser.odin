@@ -30,7 +30,7 @@ draw_laser :: proc(starting_pos: [2]f32, angle: f32, reflection_limit: int) {
 		return
 	}
 	laser_pos := starting_pos
-	velocity := [2]f32{SDL.cosf(angle), SDL.sinf(angle)}
+	velocity := [2]f32{2 * SDL.cosf(angle), 2 * SDL.sinf(angle)}
 
 	drawing_laser: for {
 		i_laser_pos := Pos{cast(i32)laser_pos.x, cast(i32)laser_pos.y}
