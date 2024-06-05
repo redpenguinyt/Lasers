@@ -159,7 +159,7 @@ handle_events :: proc(event: ^SDL.Event) {
 		}
 
 	case .Playing:
-		if event.type == SDL.EventType.MOUSEMOTION {
+		if event.button.button == 1 {
 			game.pointer.direction =
 				-SDL.atan2f(
 					cast(f32)(game.pointer.pos.x - event.button.x),
