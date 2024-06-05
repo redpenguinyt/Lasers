@@ -76,10 +76,10 @@ draw_laser :: proc(starting_pos: [2]f32, angle: f32, reflection_limit: int) {
 
 				break drawing_laser
 			}
+		}
 
-			if !is_pos_on_screen(i_laser_pos) {
-				break drawing_laser
-			}
+		if !is_pos_on_screen(i_laser_pos) {
+			break drawing_laser
 		}
 
 		laser_pos += velocity
