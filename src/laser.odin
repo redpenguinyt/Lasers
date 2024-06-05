@@ -12,11 +12,14 @@ lines_intersect :: proc(a, b, c, d: Pos) -> bool {
 }
 
 is_pos_on_screen :: proc(pos: Pos) -> bool {
+	window_width, window_height: i32
+	SDL.RenderGetLogicalSize(game.renderer, &window_width, &window_height)
+
 	return(
 		pos.x >= 0 &&
-		pos.x < WINDOW_WIDTH &&
+		pos.x < window_width &&
 		pos.y >= 0 &&
-		pos.y < WINDOW_HEIGHT \
+		pos.y < window_height \
 	)
 }
 
