@@ -23,8 +23,8 @@ Pointer :: struct {
 }
 
 GameState :: enum {
-	Editing,
 	Playing,
+	Editing,
 }
 
 Game :: struct {
