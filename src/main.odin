@@ -69,7 +69,7 @@ main :: proc() {
 }
 
 handle_events :: proc(event: ^SDL.Event) {
-	if key_down(event, .ESCAPE) {
+	if key_down(event, .ESCAPE) || key_down(event, .SPACE) {
 		game.state = game.state == .Editing ? .Aiming : .Editing
 		game.selection.state = .None
 	}
