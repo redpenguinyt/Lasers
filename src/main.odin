@@ -70,11 +70,8 @@ main :: proc() {
 	game.pointer.pos = Pos{200, 150}
 	append(
 		&game.walls,
-		Wall{Pos{100, 60}, Pos{300, 50}},
-		Wall{Pos{80, 30}, Pos{80, 200}},
-		Wall{Pos{80, 200}, Pos{100, 220}},
-		Wall{Pos{340, 20}, Pos{330, 190}},
-		Wall{Pos{100, 230}, Pos{300, 225}},
+		Wall{Pos{100, 60}, Pos{200, 50}},
+		Wall{Pos{80, 80}, Pos{80, 180}},
 	)
 
 	event: SDL.Event
