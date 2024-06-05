@@ -81,7 +81,7 @@ main :: proc() {
 	game_loop: for {
 		if SDL.PollEvent(&event) {
 			if event.type == SDL.EventType.QUIT ||
-			   (event.key.keysym.scancode == .Q &&
+			   (key_down(&event, .Q) &&
 					   (event.key.keysym.mod & SDL.KMOD_CTRL) !=
 						   SDL.KMOD_NONE) {break game_loop}
 
@@ -99,7 +99,7 @@ main :: proc() {
 }
 
 handle_events :: proc(event: ^SDL.Event) {
-	if event.type == .KEYDOWN && event.key.keysym.scancode == .ESCAPE {
+	if key_down(event, .ESCAPE) {
 		game.state = game.state == .Editing ? .Playing : .Editing
 		game.selection.state = .None
 	}
@@ -140,7 +140,7 @@ handle_events :: proc(event: ^SDL.Event) {
 		}
 
 		// Add wall
-		if event.type == .KEYDOWN && event.key.keysym.scancode == .A {
+		if key_down(event, .A) {
 			mouse_pos: Pos
 			SDL.GetMouseState(&mouse_pos.x, &mouse_pos.y)
 			mouse_pos /= PIXEL_SCALE
@@ -154,8 +154,7 @@ handle_events :: proc(event: ^SDL.Event) {
 		}
 
 		// Delete selected wall
-		if event.type == .KEYDOWN &&
-		   event.key.keysym.scancode == .X &&
+		if key_down(event, .X) &&
 		   (game.selection.state == .WallBeginning ||
 				   game.selection.state == .WallEnd) {
 			unordered_remove(&game.walls, game.selection.selected_wall_i)
@@ -172,4 +171,8 @@ handle_events :: proc(event: ^SDL.Event) {
 				SDL.M_PI / 2
 		}
 	}
+}
+
+key_down :: proc(event: ^SDL.Event, scancode: SDL.Scancode) -> bool {
+	return event.type == .KEYDOWN && event.key.keysym.scancode == scancode
 }
