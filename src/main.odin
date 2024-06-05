@@ -3,8 +3,8 @@ package main
 import "core:fmt"
 import SDL "vendor:sdl2"
 
-WINDOW_WIDTH :: 400
-WINDOW_HEIGHT :: 240
+WINDOW_WIDTH :: 400 * PIXEL_SCALE
+WINDOW_HEIGHT :: 240 * PIXEL_SCALE
 PIXEL_SCALE :: 3
 
 MAX_REFLECTIONS :: 30
@@ -48,10 +48,12 @@ main :: proc() {
 	game_loop: for {
 		event: SDL.Event
 		for SDL.PollEvent(&event) {
-			if event.type == SDL.EventType.QUIT ||
+			if event.type == .QUIT ||
 			   (key_down(&event, .Q) &&
 					   (event.key.keysym.mod & SDL.KMOD_CTRL) !=
 						   SDL.KMOD_NONE) {break game_loop}
+
+			try_rescale(&event)
 
 			handle_events(&event)
 		}
