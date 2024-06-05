@@ -66,15 +66,15 @@ free_sdl :: proc(window: ^SDL.Window) {
 main :: proc() {
 	init_sdl()
 
-	game.pointer = Pointer {
-		pos       = Pos{200, 150},
-		direction = 0.0,
-	}
-	append(&game.walls, Wall{Pos{100, 60}, Pos{300, 50}})
-	append(&game.walls, Wall{Pos{80, 30}, Pos{80, 200}})
-	append(&game.walls, Wall{Pos{80, 200}, Pos{100, 220}})
-	append(&game.walls, Wall{Pos{340, 20}, Pos{330, 190}})
-	append(&game.walls, Wall{Pos{100, 230}, Pos{300, 225}}) // TODO: add an edit move where walls can be added, moved and removed
+	game.pointer.pos = Pos{200, 150}
+	append(
+		&game.walls,
+		Wall{Pos{100, 60}, Pos{300, 50}},
+		Wall{Pos{80, 30}, Pos{80, 200}},
+		Wall{Pos{80, 200}, Pos{100, 220}},
+		Wall{Pos{340, 20}, Pos{330, 190}},
+		Wall{Pos{100, 230}, Pos{300, 225}},
+	)
 
 	event: SDL.Event
 	game_loop: for {
