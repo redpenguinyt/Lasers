@@ -38,7 +38,6 @@ draw_laser :: proc(starting_pos: [2]f32, angle: f32, reflection_limit: int) {
 	// Calculate wall normals
 	@(static)
 	wall_normals: [dynamic]f32
-
 	if reflection_limit == MAX_REFLECTIONS {
 		clear(&wall_normals)
 		for wall in game.walls {

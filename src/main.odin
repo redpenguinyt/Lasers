@@ -59,7 +59,6 @@ main :: proc() {
 		}
 
 		draw_background()
-
 		start_drawing_laser()
 		draw_walls()
 		draw_pointer()
