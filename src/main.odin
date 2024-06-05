@@ -21,11 +21,18 @@ Pointer :: struct {
 	direction: f32,
 }
 
+GameState :: enum {
+	Editing,
+	Playing,
+}
+
 Game :: struct {
-	window:   ^SDL.Window,
-	renderer: ^SDL.Renderer,
-	walls:    [dynamic]Wall,
-	pointer:  Pointer,
+	window:    ^SDL.Window,
+	renderer:  ^SDL.Renderer,
+	state:     GameState,
+	walls:     [dynamic]Wall,
+	pointer:   Pointer,
+	selection: Selection,
 }
 
 game := Game{}
@@ -67,25 +74,25 @@ main :: proc() {
 	append(&game.walls, Wall{Pos{80, 30}, Pos{80, 200}})
 	append(&game.walls, Wall{Pos{80, 200}, Pos{100, 220}})
 	append(&game.walls, Wall{Pos{340, 20}, Pos{330, 190}})
-	append(&game.walls, Wall{Pos{100, 230}, Pos{300, 225}})
+	append(&game.walls, Wall{Pos{100, 230}, Pos{300, 225}}) // TODO: add an edit move where walls can be added, moved and removed
 
 	event: SDL.Event
 	game_loop: for {
 		if SDL.PollEvent(&event) {
-			if event.type == SDL.EventType.QUIT || event.key.keysym.scancode == .ESCAPE do break game_loop
+			if event.type == SDL.EventType.QUIT ||
+			   (event.key.keysym.scancode == .Q &&
+					   (event.key.keysym.mod & SDL.KMOD_CTRL) !=
+						   SDL.KMOD_NONE) {break game_loop}
 
-			// Inputs go here
-			if event.type == SDL.EventType.MOUSEMOTION {
-				game.pointer.direction =
-					-SDL.atan2f(
-						cast(f32)(game.pointer.pos.x - event.button.x),
-						cast(f32)(game.pointer.pos.y - event.button.y),
-					) -
-					SDL.M_PI / 2
-			}
+			handle_events(&event)
 		}
 
-		SDL.SetRenderDrawColor(game.renderer, 0, 0, 0, 100)
+		switch game.state {
+		case .Editing:
+			SDL.SetRenderDrawColor(game.renderer, 50, 50, 50, 100)
+		case .Playing:
+			SDL.SetRenderDrawColor(game.renderer, 0, 0, 0, 100)
+		}
 		SDL.RenderClear(game.renderer)
 
 		// Draw code
@@ -94,6 +101,54 @@ main :: proc() {
 		draw_pointer()
 
 		SDL.RenderPresent(game.renderer)
+	}
+}
+
+handle_events :: proc(event: ^SDL.Event) {
+	if event.type == SDL.EventType.KEYDOWN &&
+	   event.key.keysym.scancode == .ESCAPE {
+		game.state = game.state == .Editing ? .Playing : .Editing
+		game.selection.state = .None
+	}
+
+	switch game.state {
+	case .Editing:
+		if event.type == SDL.EventType.MOUSEBUTTONDOWN &&
+		   event.button.button == 1 {
+			// Try select
+			try_select_wall(
+				&game.selection,
+				game.walls,
+				Pos{event.button.x, event.button.y},
+			)
+		}
+		if event.type == SDL.EventType.MOUSEMOTION {
+			mouse_motion :=
+				Pos{event.button.x, event.button.y} -
+				game.selection.last_mouse_pos
+
+			#partial switch game.selection.state {
+			case .BeginningSelected:
+				game.walls[game.selection.selected_wall_i].pos1 += mouse_motion
+			case .EndSelected:
+				game.walls[game.selection.selected_wall_i].pos2 += mouse_motion
+			}
+
+			game.selection.last_mouse_pos = Pos{event.button.x, event.button.y}
+		}
+		if event.type == SDL.EventType.MOUSEBUTTONUP {
+			game.selection.state = .None
+		}
+
+	case .Playing:
+		if event.type == SDL.EventType.MOUSEMOTION {
+			game.pointer.direction =
+				-SDL.atan2f(
+					cast(f32)(game.pointer.pos.x - event.button.x),
+					cast(f32)(game.pointer.pos.y - event.button.y),
+				) -
+				SDL.M_PI / 2
+		}
 	}
 }
 
