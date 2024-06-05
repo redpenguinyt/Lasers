@@ -27,7 +27,6 @@ GameState :: enum {
 }
 
 Game :: struct {
-	window:    ^SDL.Window,
 	renderer:  ^SDL.Renderer,
 	state:     GameState,
 	walls:     [dynamic]Wall,
@@ -37,11 +36,12 @@ Game :: struct {
 
 game := Game{}
 
-init_sdl :: proc() {
+@(deferred_out = free_sdl)
+init_sdl :: proc() -> ^SDL.Window {
 	sdl_init_error := SDL.Init(SDL.INIT_VIDEO)
 	assert(sdl_init_error == 0, SDL.GetErrorString())
 
-	game.window = SDL.CreateWindow(
+	window := SDL.CreateWindow(
 		"Lasers",
 		SDL.WINDOWPOS_CENTERED,
 		SDL.WINDOWPOS_CENTERED,
@@ -49,22 +49,22 @@ init_sdl :: proc() {
 		WINDOW_HEIGHT * 3,
 		WINDOW_FLAGS,
 	)
-	assert(game.window != nil, SDL.GetErrorString())
+	assert(window != nil, SDL.GetErrorString())
 
-	game.renderer = SDL.CreateRenderer(game.window, -1, RENDER_FLAGS)
+	game.renderer = SDL.CreateRenderer(window, -1, RENDER_FLAGS)
 	assert(game.renderer != nil, SDL.GetErrorString())
 	SDL.RenderSetLogicalSize(game.renderer, WINDOW_WIDTH, WINDOW_HEIGHT)
-}
 
-free_sdl :: proc() {
-	defer SDL.Quit()
-	defer SDL.DestroyWindow(game.window)
-	defer SDL.DestroyRenderer(game.renderer)
+	return window
+}
+free_sdl :: proc(window: ^SDL.Window) {
+	SDL.Quit()
+	SDL.DestroyWindow(window)
+	SDL.DestroyRenderer(game.renderer)
 }
 
 main :: proc() {
 	init_sdl()
-	defer free_sdl()
 
 	game.pointer = Pointer {
 		pos       = Pos{200, 150},
