@@ -74,9 +74,9 @@ main :: proc() {
 		Wall{Pos{80, 80}, Pos{80, 180}},
 	)
 
-	event: SDL.Event
 	game_loop: for {
-		if SDL.PollEvent(&event) {
+		event: SDL.Event
+		for SDL.PollEvent(&event) {
 			if event.type == SDL.EventType.QUIT ||
 			   (key_down(&event, .Q) &&
 					   (event.key.keysym.mod & SDL.KMOD_CTRL) !=
