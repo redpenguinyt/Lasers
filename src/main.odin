@@ -23,7 +23,7 @@ Pointer :: struct {
 }
 
 GameState :: enum {
-	Playing,
+	Aiming,
 	Editing,
 }
 
@@ -97,11 +97,20 @@ main :: proc() {
 
 handle_events :: proc(event: ^SDL.Event) {
 	if key_down(event, .ESCAPE) {
-		game.state = game.state == .Editing ? .Playing : .Editing
+		game.state = game.state == .Editing ? .Aiming : .Editing
 		game.selection.state = .None
 	}
 
 	switch game.state {
+	case .Aiming:
+		if event.button.button == 1 {
+			game.pointer.direction =
+				-SDL.atan2f(
+					cast(f32)(game.pointer.pos.x - event.button.x),
+					cast(f32)(game.pointer.pos.y - event.button.y),
+				) -
+				SDL.M_PI / 2
+		}
 	case .Editing:
 		if event.type == .MOUSEBUTTONDOWN && event.button.button == 1 {
 			try_select_wall(
@@ -156,16 +165,6 @@ handle_events :: proc(event: ^SDL.Event) {
 				   game.selection.state == .WallEnd) {
 			unordered_remove(&game.walls, game.selection.selected_wall_i)
 			game.selection.state = .None
-		}
-
-	case .Playing:
-		if event.button.button == 1 {
-			game.pointer.direction =
-				-SDL.atan2f(
-					cast(f32)(game.pointer.pos.x - event.button.x),
-					cast(f32)(game.pointer.pos.y - event.button.y),
-				) -
-				SDL.M_PI / 2
 		}
 	}
 }

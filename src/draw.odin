@@ -4,10 +4,10 @@ import SDL "vendor:sdl2"
 
 draw_background :: proc() {
 	switch game.state {
+	case .Aiming:
+		SDL.SetRenderDrawColor(game.renderer, 0, 0, 0, 100)
 	case .Editing:
 		SDL.SetRenderDrawColor(game.renderer, 50, 50, 50, 100)
-	case .Playing:
-		SDL.SetRenderDrawColor(game.renderer, 0, 0, 0, 100)
 	}
 	SDL.RenderClear(game.renderer)
 }
