@@ -1,6 +1,7 @@
 package main
 
 import "core:fmt"
+import "core:time"
 import SDL "vendor:sdl2"
 
 RENDER_FLAGS :: SDL.RENDERER_ACCELERATED
@@ -64,6 +65,20 @@ free_sdl :: proc(window: ^SDL.Window) {
 	SDL.DestroyRenderer(game.renderer)
 }
 
+sleep_frame :: proc() {
+	@(static)
+	frame_started: time.Time
+
+	FPS_DURATION :: time.Second / 60
+	elapsed := time.since(frame_started)
+
+	if elapsed < FPS_DURATION {
+		time.sleep(FPS_DURATION - elapsed)
+	}
+
+	frame_started = time.now()
+}
+
 main :: proc() {
 	init_sdl()
 
@@ -92,6 +107,8 @@ main :: proc() {
 		draw_pointer()
 
 		SDL.RenderPresent(game.renderer)
+
+		sleep_frame()
 	}
 }
 
