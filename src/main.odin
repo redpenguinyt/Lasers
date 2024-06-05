@@ -111,6 +111,9 @@ handle_events :: proc(event: ^SDL.Event) {
 				game.walls[game.selection.selected_wall_i].pos1 += mouse_motion
 			case .WallEnd:
 				game.walls[game.selection.selected_wall_i].pos2 += mouse_motion
+			case .WallMiddle:
+				game.walls[game.selection.selected_wall_i].pos1 += mouse_motion
+				game.walls[game.selection.selected_wall_i].pos2 += mouse_motion
 			}
 
 			game.selection.last_mouse_pos = Pos{event.button.x, event.button.y}
