@@ -1,6 +1,6 @@
 A laser simulator made with SDL in the Odin programming language
 
-https://github.com/redpenguinyt/Lasers/assets/79577742/69d22bca-1268-4c20-a6e8-c48f4740629b
+https://github.com/redpenguinyt/Lasers/assets/79577742/50dc618a-2ac6-4d04-b72f-8355268ae1ad
 
 Run with `odin run src`. If you are using Windows, you may need to add SDL.dll to the project directory
 
