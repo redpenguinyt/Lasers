@@ -7,6 +7,7 @@ RENDER_FLAGS :: SDL.RENDERER_ACCELERATED
 WINDOW_FLAGS :: SDL.WINDOW_SHOWN
 WINDOW_WIDTH :: 400
 WINDOW_HEIGHT :: 240
+PIXEL_SCALE :: 3
 
 MAX_REFLECTIONS :: 30
 
@@ -45,8 +46,8 @@ init_sdl :: proc() -> ^SDL.Window {
 		"Lasers",
 		SDL.WINDOWPOS_CENTERED,
 		SDL.WINDOWPOS_CENTERED,
-		WINDOW_WIDTH * 3,
-		WINDOW_HEIGHT * 3,
+		WINDOW_WIDTH * PIXEL_SCALE,
+		WINDOW_HEIGHT * PIXEL_SCALE,
 		WINDOW_FLAGS,
 	)
 	assert(window != nil, SDL.GetErrorString())
@@ -137,7 +138,22 @@ handle_events :: proc(event: ^SDL.Event) {
 		if event.type == .MOUSEBUTTONUP {
 			game.selection.state = .None
 		}
-		
+
+		// Add wall
+		if event.type == .KEYDOWN && event.key.keysym.scancode == .A {
+			mouse_pos: Pos
+			SDL.GetMouseState(&mouse_pos.x, &mouse_pos.y)
+			mouse_pos /= PIXEL_SCALE
+
+			append(&game.walls, Wall{mouse_pos, mouse_pos})
+			game.selection = Selection {
+				state           = .WallEnd,
+				selected_wall_i = len(game.walls) - 1,
+				last_mouse_pos  = mouse_pos,
+			}
+		}
+
+		// Delete selected wall
 		if event.type == .KEYDOWN &&
 		   event.key.keysym.scancode == .X &&
 		   (game.selection.state == .WallBeginning ||
