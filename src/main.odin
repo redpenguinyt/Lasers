@@ -137,6 +137,14 @@ handle_events :: proc(event: ^SDL.Event) {
 		if event.type == .MOUSEBUTTONUP {
 			game.selection.state = .None
 		}
+		
+		if event.type == .KEYDOWN &&
+		   event.key.keysym.scancode == .X &&
+		   (game.selection.state == .WallBeginning ||
+				   game.selection.state == .WallEnd) {
+			unordered_remove(&game.walls, game.selection.selected_wall_i)
+			game.selection.state = .None
+		}
 
 	case .Playing:
 		if event.type == SDL.EventType.MOUSEMOTION {
