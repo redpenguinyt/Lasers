@@ -98,38 +98,43 @@ main :: proc() {
 }
 
 handle_events :: proc(event: ^SDL.Event) {
-	if event.type == SDL.EventType.KEYDOWN &&
-	   event.key.keysym.scancode == .ESCAPE {
+	if event.type == .KEYDOWN && event.key.keysym.scancode == .ESCAPE {
 		game.state = game.state == .Editing ? .Playing : .Editing
 		game.selection.state = .None
 	}
 
 	switch game.state {
 	case .Editing:
-		if event.type == SDL.EventType.MOUSEBUTTONDOWN &&
-		   event.button.button == 1 {
-			// Try select
+		if event.type == .MOUSEBUTTONDOWN && event.button.button == 1 {
 			try_select_wall(
 				&game.selection,
 				game.walls,
 				Pos{event.button.x, event.button.y},
 			)
+
+			try_select_pointer(
+				&game.selection,
+				game.pointer,
+				Pos{event.button.x, event.button.y},
+			)
 		}
-		if event.type == SDL.EventType.MOUSEMOTION {
+		if event.type == .MOUSEMOTION {
 			mouse_motion :=
 				Pos{event.button.x, event.button.y} -
 				game.selection.last_mouse_pos
 
 			#partial switch game.selection.state {
-			case .BeginningSelected:
+			case .Pointer:
+				game.pointer.pos += mouse_motion
+			case .WallBeginning:
 				game.walls[game.selection.selected_wall_i].pos1 += mouse_motion
-			case .EndSelected:
+			case .WallEnd:
 				game.walls[game.selection.selected_wall_i].pos2 += mouse_motion
 			}
 
 			game.selection.last_mouse_pos = Pos{event.button.x, event.button.y}
 		}
-		if event.type == SDL.EventType.MOUSEBUTTONUP {
+		if event.type == .MOUSEBUTTONUP {
 			game.selection.state = .None
 		}
 
