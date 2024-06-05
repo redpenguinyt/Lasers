@@ -37,10 +37,3 @@ draw_pointer :: proc() {
 
 	SDL.RenderDrawLine(game.renderer, pos.x, pos.y, lineEndX, lineEndY)
 }
-
-start_drawing_laser :: proc() {
-	laser_pos := [2]f32{cast(f32)game.pointer.x, cast(f32)game.pointer.y}
-
-	SDL.SetRenderDrawColor(game.renderer, 255, 0, 0, 100)
-	draw_laser(laser_pos, game.pointer.direction, MAX_REFLECTIONS)
-}

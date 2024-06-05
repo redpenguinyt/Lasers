@@ -28,29 +28,44 @@ angle_between :: proc(angle1, angle2: f32) -> f32 {
 	return a
 }
 
-draw_laser :: proc(starting_pos: [2]f32, angle: f32, reflection_limit: int) {
+start_drawing_laser :: proc() {
+	laser_pos := [2]f32{cast(f32)game.pointer.x, cast(f32)game.pointer.y}
+
+	// Calculate wall normals
+	wall_normals: [dynamic]f32
+	defer delete(wall_normals)
+
+	for wall in game.walls {
+		wall_normal :=
+			SDL.M_PI -
+			SDL.atan2f(
+				f32(wall.pos2.x - wall.pos1.x),
+				f32(wall.pos2.y - wall.pos1.y),
+			)
+
+		append(&wall_normals, wall_normal)
+	}
+
+	SDL.SetRenderDrawColor(game.renderer, 255, 0, 0, 100)
+	draw_laser(
+		wall_normals,
+		laser_pos,
+		game.pointer.direction,
+		MAX_REFLECTIONS,
+	)
+}
+
+draw_laser :: proc(
+	wall_normals: [dynamic]f32,
+	starting_pos: [2]f32,
+	angle: f32,
+	reflection_limit: int,
+) {
 	if reflection_limit < 1 {
 		return
 	}
 	laser_pos := starting_pos
 	velocity := [2]f32{2 * SDL.cosf(angle), 2 * SDL.sinf(angle)}
-
-	// Calculate wall normals
-	@(static)
-	wall_normals: [dynamic]f32
-	if reflection_limit == MAX_REFLECTIONS {
-		clear(&wall_normals)
-		for wall in game.walls {
-			wall_normal :=
-				SDL.M_PI -
-				SDL.atan2f(
-					f32(wall.pos2.x - wall.pos1.x),
-					f32(wall.pos2.y - wall.pos1.y),
-				)
-
-			append(&wall_normals, wall_normal)
-		}
-	}
 
 	drawing_laser: for {
 		i_laser_pos := Pos{cast(i32)laser_pos.x, cast(i32)laser_pos.y}
@@ -69,6 +84,7 @@ draw_laser :: proc(starting_pos: [2]f32, angle: f32, reflection_limit: int) {
 				reflection_distance := angle_between(angle, wall_normals[i])
 
 				draw_laser(
+					wall_normals,
 					laser_pos,
 					angle + reflection_distance * 2 + SDL.M_PI,
 					reflection_limit - 1,
