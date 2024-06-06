@@ -137,7 +137,8 @@ handle_events :: proc(event: ^SDL.Event) {
 		// Delete selected wall
 		if key_down(event, .X) &&
 		   (game.selection.state == .WallBeginning ||
-				   game.selection.state == .WallEnd) {
+				   game.selection.state == .WallEnd ||
+				   game.selection.state == .WallMiddle) {
 			unordered_remove(&game.walls, game.selection.selected_wall_i)
 			game.selection.state = .None
 		}
