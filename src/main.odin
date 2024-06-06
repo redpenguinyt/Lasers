@@ -96,6 +96,10 @@ handle_events :: proc(event: ^SDL.Event) {
 				game.pointer,
 				Pos{event.button.x, event.button.y},
 			)
+
+			if game.selection.state != .None {
+				SDL.SetCursor(SDL.CreateSystemCursor(.HAND))
+			}
 		}
 		if event.type == .MOUSEMOTION {
 			mouse_motion :=
@@ -118,6 +122,7 @@ handle_events :: proc(event: ^SDL.Event) {
 		}
 		if event.type == .MOUSEBUTTONUP {
 			game.selection.state = .None
+			SDL.SetCursor(SDL.CreateSystemCursor(.ARROW))
 		}
 
 		// Add wall
@@ -132,6 +137,7 @@ handle_events :: proc(event: ^SDL.Event) {
 				selected_wall_i = len(game.walls) - 1,
 				last_mouse_pos  = mouse_pos,
 			}
+			SDL.SetCursor(SDL.CreateSystemCursor(.HAND))
 		}
 
 		// Delete selected wall
@@ -140,6 +146,7 @@ handle_events :: proc(event: ^SDL.Event) {
 			if key_down(event, .X) {
 				unordered_remove(&game.walls, game.selection.selected_wall_i)
 				game.selection.state = .None
+				SDL.SetCursor(SDL.CreateSystemCursor(.ARROW))
 			}
 		}
 	}
