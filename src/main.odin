@@ -9,8 +9,6 @@ PIXEL_SCALE :: 3
 
 MAX_REFLECTIONS :: 30
 
-Pos :: [2]i32
-
 Wall :: struct {
 	pos1, pos2: Pos,
 }

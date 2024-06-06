@@ -1,19 +1,8 @@
 package main
 
 import "core:math"
-import "base:intrinsics"
 
-distance_squared :: proc(
-	a, b: $T/[2]$E,
-) -> E where intrinsics.type_is_numeric(E) {
-	return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
-}
-
-dot :: proc(p1, p2: [2]f32) -> f32 {
-	return p1.x * p2.x + p1.y * p2.y
-}
-
-minimum_distance_squared_to_line :: proc(v, w, p: [2]f32) -> f32 {
+minimum_distance_squared_to_line :: proc(v, w, p: PosF) -> f32 {
 	l2 := distance_squared(v, w)
 	if l2 == 0.0 {return math.sqrt_f32(distance_squared(p, v))}
 	t := max(0, min(1, dot(p - v, w - v) / l2))
@@ -58,9 +47,9 @@ try_select_wall :: proc(
 		}
 
 		distance_to_all_of_line := minimum_distance_squared_to_line(
-			{cast(f32)wall.pos1.x, cast(f32)wall.pos1.y},
-			{cast(f32)wall.pos2.x, cast(f32)wall.pos2.y},
-			{cast(f32)mouse_pos.x, cast(f32)mouse_pos.y},
+			pos_to_posf(wall.pos1),
+			pos_to_posf(wall.pos2),
+			pos_to_posf(mouse_pos),
 		)
 		if distance_to_all_of_line < 36 {
 			selection.state = .WallMiddle
@@ -75,12 +64,8 @@ try_select_pointer :: proc(
 	pointer: Pointer,
 	mouse_pos: Pos,
 ) {
-	distance_to_pointer := (pointer.pos - mouse_pos)
-	magnitude_to_pointer :=
-		distance_to_pointer.x * distance_to_pointer.x +
-		distance_to_pointer.y * distance_to_pointer.y
-
-	if magnitude_to_pointer < 36 {
+	distance_to_pointer := distance_squared(pointer.pos, mouse_pos)
+	if distance_to_pointer < 36 {
 		selection.state = .Pointer
 		selection.last_mouse_pos = mouse_pos
 	}

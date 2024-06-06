@@ -29,8 +29,6 @@ angle_between :: proc(angle1, angle2: f32) -> f32 {
 }
 
 start_drawing_laser :: proc() {
-	laser_pos := [2]f32{cast(f32)game.pointer.x, cast(f32)game.pointer.y}
-
 	// Calculate wall normals
 	wall_normals: [dynamic]f32
 	defer delete(wall_normals)
@@ -49,7 +47,7 @@ start_drawing_laser :: proc() {
 	SDL.SetRenderDrawColor(game.renderer, 255, 0, 0, 100)
 	draw_laser(
 		wall_normals,
-		laser_pos,
+		pos_to_posf(game.pointer.pos),
 		game.pointer.direction,
 		MAX_REFLECTIONS,
 	)
@@ -57,7 +55,7 @@ start_drawing_laser :: proc() {
 
 draw_laser :: proc(
 	wall_normals: [dynamic]f32,
-	starting_pos: [2]f32,
+	starting_pos: PosF,
 	angle: f32,
 	reflection_limit: int,
 ) {
@@ -65,14 +63,11 @@ draw_laser :: proc(
 		return
 	}
 	laser_pos := starting_pos
-	velocity := [2]f32{2 * SDL.cosf(angle), 2 * SDL.sinf(angle)}
+	velocity := PosF{2 * SDL.cosf(angle), 2 * SDL.sinf(angle)}
 
 	drawing_laser: for {
-		i_laser_pos := Pos{cast(i32)laser_pos.x, cast(i32)laser_pos.y}
-		i_future_pos := Pos {
-			cast(i32)(laser_pos.x + velocity.x),
-			cast(i32)(laser_pos.y + velocity.y),
-		}
+		i_laser_pos := posf_to_pos(laser_pos)
+		i_future_pos := posf_to_pos(laser_pos + velocity)
 
 		for wall, i in game.walls {
 			if lines_intersect(
