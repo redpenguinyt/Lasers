@@ -11,15 +11,37 @@ lines_intersect :: proc(a, b, c, d: Pos) -> bool {
 	return ccw(a, c, d) != ccw(b, c, d) && ccw(a, b, c) != ccw(a, b, d)
 }
 
+laser_bounds: Wall
+generate_laser_bounding_box :: proc() {
+	window_width, window_height: i32
+	SDL.RenderGetLogicalSize(game.renderer, &window_width, &window_height)
+	laser_bounds = Wall {
+		-game.camera_offset,
+		Pos{window_width, window_height} - game.camera_offset,
+	}
+
+	for wall in game.walls {
+		laser_bounds.pos1.x = min(laser_bounds.pos1.x, wall.pos1.x)
+		laser_bounds.pos1.y = min(laser_bounds.pos1.y, wall.pos1.y)
+		laser_bounds.pos2.x = max(laser_bounds.pos2.x, wall.pos1.x)
+		laser_bounds.pos2.y = max(laser_bounds.pos2.y, wall.pos1.y)
+
+		laser_bounds.pos1.x = min(laser_bounds.pos1.x, wall.pos2.x)
+		laser_bounds.pos1.y = min(laser_bounds.pos1.y, wall.pos2.y)
+		laser_bounds.pos2.x = max(laser_bounds.pos2.x, wall.pos2.x)
+		laser_bounds.pos2.y = max(laser_bounds.pos2.y, wall.pos2.y)
+	}
+}
+
 is_pos_on_screen :: proc(pos: Pos) -> bool {
 	window_width, window_height: i32
 	SDL.RenderGetLogicalSize(game.renderer, &window_width, &window_height)
 
 	return(
-		pos.x >= 0 &&
-		pos.x < window_width &&
-		pos.y >= 0 &&
-		pos.y < window_height \
+		pos.x >= laser_bounds.pos1.x &&
+		pos.x < laser_bounds.pos2.x &&
+		pos.y >= laser_bounds.pos1.y &&
+		pos.y < laser_bounds.pos2.y \
 	)
 }
 
@@ -43,6 +65,7 @@ start_drawing_laser :: proc() {
 
 		append(&wall_normals, wall_normal)
 	}
+	generate_laser_bounding_box()
 
 	SDL.SetRenderDrawColor(game.renderer, 255, 0, 0, 100)
 	draw_laser(
