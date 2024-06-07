@@ -30,7 +30,7 @@ try_select_wall :: proc(
 	mouse_pos: Pos,
 ) {
 	for wall, i in walls {
-		distance_to_pos1 := distance_squared(wall.pos1 - game.camera_offset, mouse_pos)
+		distance_to_pos1 := distance_squared(wall.pos1, mouse_pos)
 		if distance_to_pos1 < 36 {
 			selection.state = .WallBeginning
 			selection.selected_wall_i = i
