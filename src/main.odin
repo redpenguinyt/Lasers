@@ -24,11 +24,12 @@ GameState :: enum {
 }
 
 Game :: struct {
-	renderer:  ^SDL.Renderer,
-	state:     GameState,
-	walls:     [dynamic]Wall,
-	pointer:   Pointer,
-	selection: Selection,
+	renderer:      ^SDL.Renderer,
+	state:         GameState,
+	walls:         [dynamic]Wall,
+	pointer:       Pointer,
+	camera_offset: Pos,
+	selection:     Selection,
 }
 
 game := Game{}
@@ -73,28 +74,37 @@ handle_events :: proc(event: ^SDL.Event) {
 		game.selection.state = .None
 	}
 
+	if event.type == .MOUSEMOTION {
+		if SDL.GetMouseState(nil, nil) & SDL.BUTTON_MIDDLE != 0 {
+			game.camera_offset.x += event.motion.xrel
+			game.camera_offset.y += event.motion.yrel
+		}
+	}
+
 	switch game.state {
 	case .Aiming:
-		if event.button.button == 1 {
+		if event.button.button & SDL.BUTTON_LEFT != 0 {
+			pointer_to_mouse := pos_to_posf(
+				game.pointer.pos - Pos{event.button.x, event.button.y} + game.camera_offset,
+			)
+
 			game.pointer.direction =
-				-SDL.atan2f(
-					cast(f32)(game.pointer.pos.x - event.button.x),
-					cast(f32)(game.pointer.pos.y - event.button.y),
-				) -
-				SDL.M_PI / 2
+				1.5 * SDL.M_PI -
+				SDL.atan2f(pointer_to_mouse.x, pointer_to_mouse.y)
+
 		}
 	case .Editing:
 		if event.type == .MOUSEBUTTONDOWN && event.button.button == 1 {
 			try_select_wall(
 				&game.selection,
 				game.walls,
-				Pos{event.button.x, event.button.y},
+				Pos{event.button.x, event.button.y} - game.camera_offset,
 			)
 
 			try_select_pointer(
 				&game.selection,
 				game.pointer,
-				Pos{event.button.x, event.button.y},
+				Pos{event.button.x, event.button.y} - game.camera_offset,
 			)
 
 			if game.selection.state != .None {
@@ -103,7 +113,7 @@ handle_events :: proc(event: ^SDL.Event) {
 		}
 		if event.type == .MOUSEMOTION {
 			mouse_motion :=
-				Pos{event.button.x, event.button.y} -
+				(Pos{event.button.x, event.button.y} - game.camera_offset) -
 				game.selection.last_mouse_pos
 
 			#partial switch game.selection.state {
@@ -118,7 +128,8 @@ handle_events :: proc(event: ^SDL.Event) {
 				game.walls[game.selection.selected_wall_i].pos2 += mouse_motion
 			}
 
-			game.selection.last_mouse_pos = Pos{event.button.x, event.button.y}
+			game.selection.last_mouse_pos =
+				Pos{event.button.x, event.button.y} - game.camera_offset
 		}
 		if event.type == .MOUSEBUTTONUP {
 			game.selection.state = .None

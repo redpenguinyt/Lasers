@@ -98,9 +98,9 @@ draw_laser :: proc(
 
 	SDL.RenderDrawLine(
 		game.renderer,
-		cast(i32)starting_pos.x,
-		cast(i32)starting_pos.y,
-		cast(i32)laser_pos.x,
-		cast(i32)laser_pos.y,
+		game.camera_offset.x + cast(i32)starting_pos.x,
+		game.camera_offset.y + cast(i32)starting_pos.y,
+		game.camera_offset.x + cast(i32)laser_pos.x,
+		game.camera_offset.y + cast(i32)laser_pos.y,
 	)
 }

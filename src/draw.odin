@@ -18,22 +18,23 @@ draw_walls :: proc() {
 	for wall in game.walls {
 		SDL.RenderDrawLine(
 			game.renderer,
-			wall.pos1.x,
-			wall.pos1.y,
-			wall.pos2.x,
-			wall.pos2.y,
+			game.camera_offset.x + wall.pos1.x,
+			game.camera_offset.y + wall.pos1.y,
+			game.camera_offset.x + wall.pos2.x,
+			game.camera_offset.y + wall.pos2.y,
 		)
 	}
 }
 
 draw_pointer :: proc() {
-	using game.pointer
+	pos := game.pointer.pos
+	pos += game.camera_offset
 
 	SDL.SetRenderDrawColor(game.renderer, 255, 255, 255, 100)
 	SDL.RenderDrawRect(game.renderer, &SDL.Rect{pos.x - 4, pos.y - 4, 8, 8})
 
-	lineEndX := pos.x + i32(7 * SDL.cosf(direction))
-	lineEndY := pos.y + i32(7 * SDL.sinf(direction))
+	lineEndX := pos.x + i32(7 * SDL.cosf(game.pointer.direction))
+	lineEndY := pos.y + i32(7 * SDL.sinf(game.pointer.direction))
 
 	SDL.RenderDrawLine(game.renderer, pos.x, pos.y, lineEndX, lineEndY)
 }
