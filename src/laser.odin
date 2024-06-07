@@ -20,6 +20,11 @@ generate_laser_bounding_box :: proc() {
 		Pos{window_width, window_height} - game.camera_offset,
 	}
 
+	laser_bounds.pos1.x = min(laser_bounds.pos1.x, game.pointer.pos.x)
+	laser_bounds.pos1.y = min(laser_bounds.pos1.y, game.pointer.pos.y)
+	laser_bounds.pos2.x = max(laser_bounds.pos2.x, game.pointer.pos.x + 1)
+	laser_bounds.pos2.y = max(laser_bounds.pos2.y, game.pointer.pos.y + 1)
+
 	for wall in game.walls {
 		laser_bounds.pos1.x = min(laser_bounds.pos1.x, wall.pos1.x)
 		laser_bounds.pos1.y = min(laser_bounds.pos1.y, wall.pos1.y)
