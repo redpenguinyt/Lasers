@@ -83,15 +83,21 @@ handle_events :: proc(event: ^SDL.Event) {
 
 	switch game.state {
 	case .Aiming:
-		if event.button.button & SDL.BUTTON_LEFT != 0 {
-			pointer_to_mouse := pos_to_posf(
-				game.pointer.pos - Pos{event.button.x, event.button.y} + game.camera_offset,
-			)
+		#partial switch event.type {
+		case .MOUSEBUTTONDOWN, .MOUSEMOTION:
+			if event.button.button & SDL.BUTTON_LEFT != 0 {
+				pointer_to_mouse := pos_to_posf(
+					game.pointer.pos -
+					Pos{event.button.x, event.button.y} +
+					game.camera_offset,
+				)
+				fmt.println("why is it triggering", pointer_to_mouse)
 
-			game.pointer.direction =
-				1.5 * SDL.M_PI -
-				SDL.atan2f(pointer_to_mouse.x, pointer_to_mouse.y)
+				game.pointer.direction =
+					1.5 * SDL.M_PI -
+					SDL.atan2f(pointer_to_mouse.x, pointer_to_mouse.y)
 
+			}
 		}
 	case .Editing:
 		if event.type == .MOUSEBUTTONDOWN && event.button.button == 1 {
