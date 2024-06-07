@@ -141,6 +141,7 @@ handle_events :: proc(event: ^SDL.Event) {
 			mouse_pos: Pos
 			SDL.GetMouseState(&mouse_pos.x, &mouse_pos.y)
 			mouse_pos /= PIXEL_SCALE
+			mouse_pos -= game.camera_offset
 
 			append(&game.walls, Wall{mouse_pos, mouse_pos})
 			game.selection = Selection {
