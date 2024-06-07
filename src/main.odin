@@ -91,7 +91,6 @@ handle_events :: proc(event: ^SDL.Event) {
 					Pos{event.button.x, event.button.y} +
 					game.camera_offset,
 				)
-				fmt.println("why is it triggering", pointer_to_mouse)
 
 				game.pointer.direction =
 					1.5 * SDL.M_PI -
