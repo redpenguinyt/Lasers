@@ -16,19 +16,15 @@ init_sdl :: proc() -> ^SDL.Window {
 		"Lasers",
 		SDL.WINDOWPOS_CENTERED,
 		SDL.WINDOWPOS_CENTERED,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
+		WINDOW_WIDTH * game.pixel_scale,
+		WINDOW_HEIGHT * game.pixel_scale,
 		WINDOW_FLAGS,
 	)
 	assert(window != nil, SDL.GetErrorString())
 
 	game.renderer = SDL.CreateRenderer(window, -1, RENDER_FLAGS)
 	assert(game.renderer != nil, SDL.GetErrorString())
-	SDL.RenderSetLogicalSize(
-		game.renderer,
-		WINDOW_WIDTH / PIXEL_SCALE,
-		WINDOW_HEIGHT / PIXEL_SCALE,
-	)
+	SDL.RenderSetLogicalSize(game.renderer, WINDOW_WIDTH, WINDOW_HEIGHT)
 
 	return window
 }
@@ -41,14 +37,17 @@ free_sdl :: proc(window: ^SDL.Window) {
 try_rescale :: proc(event: ^SDL.Event) {
 	if event.type == SDL.EventType.WINDOWEVENT {
 		if event.window.event == SDL.WindowEventID.RESIZED {
-			SDL.RenderSetLogicalSize(
-				game.renderer,
-				event.window.data1 / PIXEL_SCALE,
-				event.window.data2 / PIXEL_SCALE,
-			)
+			rescale()
 		}
 
 	}
+}
+
+rescale :: proc() {
+	window_size: Pos
+	SDL.GetRendererOutputSize(game.renderer, &window_size.x, &window_size.y)
+	new_size := window_size / game.pixel_scale
+	SDL.RenderSetLogicalSize(game.renderer, new_size.x, new_size.y)
 }
 
 sleep_frame :: proc() {

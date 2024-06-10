@@ -8,7 +8,8 @@ Run with `odin run src`
 
 ### Keybinds:
 - `Escape` or `Space` to toggle between editing walls and aiming the pointer
-- `Ctrl+Q` to close
+- `Ctrl Q` to close
+- `Ctrl -`/`Ctrl +` to adjust pixel scale (zoom in/out)
 
 ### Aim Mode: (Black background)
 Hold left click to aim the pointer

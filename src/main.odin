@@ -3,9 +3,8 @@ package main
 import "core:fmt"
 import SDL "vendor:sdl2"
 
-WINDOW_WIDTH :: 400 * PIXEL_SCALE
-WINDOW_HEIGHT :: 240 * PIXEL_SCALE
-PIXEL_SCALE :: 3
+WINDOW_WIDTH :: 400
+WINDOW_HEIGHT :: 240
 
 MAX_REFLECTIONS :: 64
 
@@ -25,6 +24,7 @@ GameState :: enum {
 
 Game :: struct {
 	renderer:      ^SDL.Renderer,
+	pixel_scale:   i32,
 	state:         GameState,
 	walls:         [dynamic]Wall,
 	pointer:       Pointer,
@@ -35,14 +35,15 @@ Game :: struct {
 game := Game{}
 
 main :: proc() {
-	init_sdl()
-
+	game.pixel_scale = 3
 	game.pointer.pos = Pos{200, 150}
 	append(
 		&game.walls,
 		Wall{Pos{100, 60}, Pos{200, 50}},
 		Wall{Pos{80, 80}, Pos{80, 180}},
 	)
+
+	init_sdl()
 
 	game_loop: for {
 		event: SDL.Event
@@ -72,6 +73,17 @@ handle_events :: proc(event: ^SDL.Event) {
 	if key_down(event, .ESCAPE) || key_down(event, .SPACE) {
 		game.state = game.state == .Editing ? .Aiming : .Editing
 		game.selection.state = .None
+	}
+
+	if key_down(event, .MINUS) &&
+	   ((event.key.keysym.mod & SDL.KMOD_CTRL) != SDL.KMOD_NONE) {
+		game.pixel_scale = max(game.pixel_scale - 1, 1)
+		rescale()
+	}
+	if key_down(event, .EQUALS) &&
+	   ((event.key.keysym.mod & SDL.KMOD_CTRL) != SDL.KMOD_NONE) {
+		game.pixel_scale += 1
+		rescale()
 	}
 
 	if event.type == .MOUSEMOTION {
@@ -145,7 +157,7 @@ handle_events :: proc(event: ^SDL.Event) {
 		if key_down(event, .A) {
 			mouse_pos: Pos
 			SDL.GetMouseState(&mouse_pos.x, &mouse_pos.y)
-			mouse_pos /= PIXEL_SCALE
+			mouse_pos /= game.pixel_scale
 			mouse_pos -= game.camera_offset
 
 			append(&game.walls, Wall{mouse_pos, mouse_pos})
