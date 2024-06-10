@@ -1,14 +1,12 @@
 package main
 
-import "core:fmt"
 import SDL "vendor:sdl2"
-
-ccw :: proc(a, b, c: Pos) -> bool {
-	return (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x)
-}
 
 lines_intersect :: proc(a, b, c, d: Pos) -> bool {
 	return ccw(a, c, d) != ccw(b, c, d) && ccw(a, b, c) != ccw(a, b, d)
+}
+ccw :: proc(a, b, c: Pos) -> bool {
+	return (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x)
 }
 
 laser_bounds: Wall
@@ -34,9 +32,6 @@ expand_bounds_by_point :: proc(bounds: ^Wall, pos: Pos) {
 }
 
 is_pos_on_screen :: proc(pos: Pos) -> bool {
-	window_width, window_height: i32
-	SDL.RenderGetLogicalSize(game.renderer, &window_width, &window_height)
-
 	return(
 		pos.x >= laser_bounds.pos1.x &&
 		pos.x < laser_bounds.pos2.x &&
@@ -73,7 +68,7 @@ start_drawing_laser :: proc() {
 		pos_to_posf(game.pointer.pos),
 		game.pointer.direction,
 		MAX_REFLECTIONS,
-		nil
+		nil,
 	)
 }
 
@@ -113,7 +108,7 @@ draw_laser :: proc(
 					laser_pos,
 					angle + reflection_distance * 2 + SDL.M_PI,
 					reflection_limit - 1,
-					i
+					i,
 				)
 
 				break drawing_laser
@@ -127,11 +122,7 @@ draw_laser :: proc(
 		laser_pos += velocity
 	}
 
-	SDL.RenderDrawLine(
-		game.renderer,
-		game.camera_offset.x + cast(i32)starting_pos.x,
-		game.camera_offset.y + cast(i32)starting_pos.y,
-		game.camera_offset.x + cast(i32)laser_pos.x,
-		game.camera_offset.y + cast(i32)laser_pos.y,
-	)
+	dp1 := game.camera_offset + posf_to_pos(starting_pos)
+	dp2 := game.camera_offset + posf_to_pos(laser_pos)
+	SDL.RenderDrawLine(game.renderer, dp1.x, dp1.y, dp2.x, dp2.y)
 }

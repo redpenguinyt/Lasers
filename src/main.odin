@@ -1,6 +1,5 @@
 package main
 
-import "core:fmt"
 import SDL "vendor:sdl2"
 
 WINDOW_WIDTH :: 400

@@ -38,7 +38,7 @@ try_select_wall :: proc(
 			return
 		}
 
-		distance_to_pos2 := distance_squared(wall.pos2 , mouse_pos)
+		distance_to_pos2 := distance_squared(wall.pos2, mouse_pos)
 		if distance_to_pos2 < 36 {
 			selection.state = .WallEnd
 			selection.selected_wall_i = i

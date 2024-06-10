@@ -45,18 +45,14 @@ try_rescale :: proc(event: ^SDL.Event) {
 
 rescale :: proc() {
 	old_size: Pos
-	SDL.RenderGetLogicalSize(
-		game.renderer,
-		&old_size.x,
-		&old_size.y,
-	)
+	SDL.RenderGetLogicalSize(game.renderer, &old_size.x, &old_size.y)
 
 	window_size: Pos
 	SDL.GetRendererOutputSize(game.renderer, &window_size.x, &window_size.y)
 	new_size := window_size / game.pixel_scale
 	SDL.RenderSetLogicalSize(game.renderer, new_size.x, new_size.y)
 
-	game.camera_offset += (new_size - old_size)/2
+	game.camera_offset += (new_size - old_size) / 2
 }
 
 sleep_frame :: proc() {
