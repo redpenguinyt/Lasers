@@ -78,6 +78,7 @@ start_drawing_laser :: proc() {
 		pos_to_posf(game.pointer.pos),
 		game.pointer.direction,
 		MAX_REFLECTIONS,
+		nil
 	)
 }
 
@@ -86,18 +87,24 @@ draw_laser :: proc(
 	starting_pos: PosF,
 	angle: f32,
 	reflection_limit: int,
+	ignore_wall: Maybe(int),
 ) {
 	if reflection_limit < 1 {
 		return
 	}
 	laser_pos := starting_pos
-	velocity := PosF{2 * SDL.cosf(angle), 2 * SDL.sinf(angle)}
+	velocity := PosF{SDL.cosf(angle), SDL.sinf(angle)}
 
 	drawing_laser: for {
 		i_laser_pos := posf_to_pos(laser_pos)
 		i_future_pos := posf_to_pos(laser_pos + velocity)
 
 		for wall, i in game.walls {
+			ignore_wall_i, ok := ignore_wall.?
+			if ignore_wall_i == i && ok {
+				continue
+			}
+
 			if lines_intersect(
 				i_laser_pos,
 				i_future_pos,
@@ -111,6 +118,7 @@ draw_laser :: proc(
 					laser_pos,
 					angle + reflection_distance * 2 + SDL.M_PI,
 					reflection_limit - 1,
+					i
 				)
 
 				break drawing_laser
