@@ -41,8 +41,7 @@ is_pos_on_screen :: proc(pos: Pos) -> bool {
 }
 
 angle_between :: proc(angle1, angle2: f32) -> f32 {
-	a := SDL.atan2f(SDL.sinf(angle2 - angle1), SDL.cosf(angle2 - angle1))
-	return a
+	return SDL.atan2f(SDL.sinf(angle2 - angle1), SDL.cosf(angle2 - angle1))
 }
 
 start_drawing_laser :: proc() {
