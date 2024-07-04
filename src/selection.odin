@@ -24,11 +24,7 @@ Selection :: struct {
 	last_mouse_pos:  Pos,
 }
 
-try_select_wall :: proc(
-	selection: ^Selection,
-	walls: [dynamic]Wall,
-	mouse_pos: Pos,
-) {
+try_select_wall :: proc(selection: ^Selection, walls: [dynamic]Wall, mouse_pos: Pos) {
 	for wall, i in walls {
 		distance_to_pos1 := distance_squared(wall.pos1, mouse_pos)
 		if distance_to_pos1 < 36 {
@@ -59,11 +55,7 @@ try_select_wall :: proc(
 	}
 }
 
-try_select_pointer :: proc(
-	selection: ^Selection,
-	pointer: Pointer,
-	mouse_pos: Pos,
-) {
+try_select_pointer :: proc(selection: ^Selection, pointer: Pointer, mouse_pos: Pos) {
 	distance_to_pointer := distance_squared(pointer.pos, mouse_pos)
 	if distance_to_pointer < 36 {
 		selection.state = .Pointer

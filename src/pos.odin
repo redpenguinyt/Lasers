@@ -5,9 +5,7 @@ import "base:intrinsics"
 Pos :: [2]i32
 PosF :: [2]f32
 
-distance_squared :: proc(
-	a, b: [2]$T,
-) -> T where intrinsics.type_is_numeric(T) {
+distance_squared :: proc(a, b: [2]$T) -> T where intrinsics.type_is_numeric(T) {
 	return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
 }
 

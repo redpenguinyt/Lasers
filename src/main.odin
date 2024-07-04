@@ -36,11 +36,7 @@ game := Game{}
 main :: proc() {
 	game.pixel_scale = 3
 	game.pointer.pos = Pos{200, 150}
-	append(
-		&game.walls,
-		Wall{Pos{100, 60}, Pos{200, 50}},
-		Wall{Pos{80, 80}, Pos{80, 180}},
-	)
+	append(&game.walls, Wall{Pos{100, 60}, Pos{200, 50}}, Wall{Pos{80, 80}, Pos{80, 180}})
 
 	init_sdl()
 
@@ -49,8 +45,7 @@ main :: proc() {
 		for SDL.PollEvent(&event) {
 			if event.type == .QUIT ||
 			   (key_down(&event, .Q) &&
-					   (event.key.keysym.mod & SDL.KMOD_CTRL) !=
-						   SDL.KMOD_NONE) {break game_loop}
+					   (event.key.keysym.mod & SDL.KMOD_CTRL) != SDL.KMOD_NONE) {break game_loop}
 
 			try_rescale(&event)
 
@@ -74,13 +69,11 @@ handle_events :: proc(event: ^SDL.Event) {
 		game.selection.state = .None
 	}
 
-	if key_down(event, .MINUS) &&
-	   ((event.key.keysym.mod & SDL.KMOD_CTRL) != SDL.KMOD_NONE) {
+	if key_down(event, .MINUS) && ((event.key.keysym.mod & SDL.KMOD_CTRL) != SDL.KMOD_NONE) {
 		game.pixel_scale = max(game.pixel_scale - 1, 1)
 		rescale()
 	}
-	if key_down(event, .EQUALS) &&
-	   ((event.key.keysym.mod & SDL.KMOD_CTRL) != SDL.KMOD_NONE) {
+	if key_down(event, .EQUALS) && ((event.key.keysym.mod & SDL.KMOD_CTRL) != SDL.KMOD_NONE) {
 		game.pixel_scale += 1
 		rescale()
 	}
@@ -98,14 +91,11 @@ handle_events :: proc(event: ^SDL.Event) {
 		case .MOUSEBUTTONDOWN, .MOUSEMOTION:
 			if event.button.button & SDL.BUTTON_LEFT != 0 {
 				pointer_to_mouse := pos_to_posf(
-					game.pointer.pos -
-					Pos{event.button.x, event.button.y} +
-					game.camera_offset,
+					game.pointer.pos - Pos{event.button.x, event.button.y} + game.camera_offset,
 				)
 
 				game.pointer.direction =
-					1.5 * SDL.M_PI -
-					SDL.atan2f(pointer_to_mouse.x, pointer_to_mouse.y)
+					1.5 * SDL.M_PI - SDL.atan2f(pointer_to_mouse.x, pointer_to_mouse.y)
 
 			}
 		}

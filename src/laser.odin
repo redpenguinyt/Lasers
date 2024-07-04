@@ -13,10 +13,7 @@ laser_bounds: Wall
 generate_laser_bounding_box :: proc() {
 	window_width, window_height: i32
 	SDL.RenderGetLogicalSize(game.renderer, &window_width, &window_height)
-	laser_bounds = Wall {
-		-game.camera_offset,
-		Pos{window_width, window_height} - game.camera_offset,
-	}
+	laser_bounds = Wall{-game.camera_offset, Pos{window_width, window_height} - game.camera_offset}
 
 	expand_bounds_by_point(&laser_bounds, game.pointer.pos)
 	for wall in game.walls {
@@ -51,11 +48,7 @@ start_drawing_laser :: proc() {
 
 	for wall in game.walls {
 		wall_normal :=
-			SDL.M_PI -
-			SDL.atan2f(
-				f32(wall.pos2.x - wall.pos1.x),
-				f32(wall.pos2.y - wall.pos1.y),
-			)
+			SDL.M_PI - SDL.atan2f(f32(wall.pos2.x - wall.pos1.x), f32(wall.pos2.y - wall.pos1.y))
 
 		append(&wall_normals, wall_normal)
 	}
@@ -94,12 +87,7 @@ draw_laser :: proc(
 				continue
 			}
 
-			if lines_intersect(
-				i_laser_pos,
-				i_future_pos,
-				wall.pos1,
-				wall.pos2,
-			) {
+			if lines_intersect(i_laser_pos, i_future_pos, wall.pos1, wall.pos2) {
 				reflection_distance := angle_between(angle, wall_normals[i])
 
 				draw_laser(
